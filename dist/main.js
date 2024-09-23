@@ -6,12 +6,12 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const PORT = process.env.PORT || 3001;
     app.enableCors({
-        origin: [
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://localhost:3002',
-        ],
+        origin: [/^(.*)/],
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        preflightContinue: false,
+        optionsSuccessStatus: 200,
         credentials: true,
+        allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization,authorization,X-Forwarded-for',
     });
     await app.listen(PORT);
 }
