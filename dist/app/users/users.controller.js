@@ -16,10 +16,18 @@ exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const create_user_dto_1 = require("../../domain/dtos/create-user.dto");
-const jwt_auth_guard_1 = require("../libs/security/guards/jwt-auth.guard");
+const current_user_decorator_1 = require("../libs/security/decorators/current-user.decorator");
+const user_session_dto_1 = require("../../domain/dtos/user-session.dto");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
+    }
+    async findUser(currentUser) {
+        const user = await this.usersService.findById({ id: currentUser.sub });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found!');
+        }
+        return user;
     }
     create(createUserDto) {
         return this.usersService.create(createUserDto);
@@ -36,7 +44,13 @@ let UsersController = class UsersController {
 };
 exports.UsersController = UsersController;
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('/profile'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_session_dto_1.UserSessionDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "findUser", null);
+__decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
